@@ -1,0 +1,157 @@
+//gay
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lua Script Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/dracula.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            height: 90vh; /* Увеличено для большего окна */
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+            transition: transform 0.2s;
+        }
+
+        .buttons button:hover {
+            transform: scale(1.05);
+        }
+
+        .editor-container {
+            flex-grow: 1; /* Занимает всё доступное пространство */
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex; /* Для адаптивности CodeMirror */
+        }
+
+        .CodeMirror {
+            height: 100% !important; /* Полная высота контейнера */
+            width: 100% !important; /* Полная ширина контейнера */
+            font-size: 16px; /* Увеличен шрифт для удобства */
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lua Script Editor</h1>
+            <div class="buttons">
+                <button onclick="formatCode()">Format Code</button>
+                <button onclick="clearEditor()">Clear</button>
+                <button onclick="downloadCode()">Download</button>
+            </div>
+        </div>
+        <div class="editor-container">
+            <textarea id="editor">-- Write your Lua script here
+print("Hello, Lua!")</textarea>
+        </div>
+        <div class="footer">
+            Created with ❤️ using CodeMirror
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/lua/lua.min.js"></script>
+    <script>
+        const editor = CodeMirror.fromTextArea(document.getElementById('editor'), {
+            mode: 'lua',
+            theme: 'dracula',
+            lineNumbers: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            tabSize: 4,
+            indentWithTabs: true,
+            extraKeys: {
+                'Ctrl-Space': 'autocomplete'
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            editor.refresh();
+        });
+
+        function formatCode() {
+            const code = editor.getValue();
+            try {
+                let formatted = code
+                    .replace(/\n\s*\n/g, '\n')
+                    .split('\n')
+                    .map(line => line.trimEnd())
+                    .join('\n');
+                editor.setValue(formatted);
+            } catch (e) {
+                alert('Error formatting code: ' + e.message);
+            }
+        }
+
+        function clearEditor() {
+            editor.setValue('');
+        }
+
+        function downloadCode() {
+            const code = editor.getValue();
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'script.lua';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
