@@ -4,18 +4,13 @@
   <meta charset="UTF-8">
   <title>LuaScriptEditor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CodeMirror CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material.css">
-
-  <!-- CodeMirror JS -->
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/lua/lua.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/closebrackets.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/matchbrackets.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/selection/active-line.js"></script>
-
   <style>
     :root {
       --bg-main: #fff6fa;
@@ -106,6 +101,7 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     .CodeMirror {
@@ -116,6 +112,22 @@
       background-color: var(--editor-wrapper-bg) !important;
       padding: 10px;
       overflow: auto;
+      scroll-behavior: smooth;
+    }
+
+    .CodeMirror-gutters {
+      min-width: 40px;
+    }
+
+    .CodeMirror-scroll {
+      overflow-x: hidden !important;
+      overflow-y: auto !important;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .CodeMirror-scroll::-webkit-scrollbar {
+      display: none;
     }
 
     @media (max-width: 768px) {
@@ -157,10 +169,7 @@
 
   <div id="editor-container">
     <div class="editor-wrapper">
-      <textarea id="code">
-// Example Lua script
-print("Hello, Lua!")
-      </textarea>
+      <textarea id="code">print("Hello, Lua!")</textarea>
     </div>
   </div>
 
