@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -67,15 +67,11 @@
       border: 1px solid #ffb6c1;
       background: #fff9fa;
       box-shadow: 0 4px 20px rgba(216, 90, 127, 0.2);
-    }
-
-    #editor {
       height: 500px;
     }
 
-    .cm-editor {
+    #editor {
       height: 100%;
-      font-size: 16px;
     }
 
     .script-list {
@@ -144,11 +140,13 @@
   </div>
 
   <script type="module">
-    import { EditorView, basicSetup } from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@6.0.1/dist/index.min.js";
-    import { EditorState } from "https://cdn.jsdelivr.net/npm/@codemirror/state@6.2.0/dist/index.min.js";
-    import { lua } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-lua@6.1.3/dist/index.min.js";
-    import { lineNumbers } from "https://cdn.jsdelivr.net/npm/@codemirror/view@6.15.2/dist/index.min.js";
-    import { oneDark } from "https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@6.2.0/dist/index.min.js";
+    import {EditorView, keymap, highlightSpecialChars, drawSelection, highlightActiveLine} from "https://esm.sh/@codemirror/view";
+    import {EditorState} from "https://esm.sh/@codemirror/state";
+    import {defaultHighlightStyle} from "https://esm.sh/@codemirror/highlight";
+    import {lineNumbers} from "https://esm.sh/@codemirror/gutter";
+    import {history, historyKeymap} from "https://esm.sh/@codemirror/commands";
+    import {indentOnInput} from "https://esm.sh/@codemirror/language";
+    import {lua} from "https://esm.sh/@codemirror/lang-lua";
 
     let editor;
 
@@ -156,7 +154,18 @@
       editor = new EditorView({
         state: EditorState.create({
           doc,
-          extensions: [basicSetup, lineNumbers(), lua(), oneDark]
+          extensions: [
+            lineNumbers(),
+            highlightSpecialChars(),
+            history(),
+            drawSelection(),
+            indentOnInput(),
+            highlightActiveLine(),
+            defaultHighlightStyle.fallback,
+            keymap.of(historyKeymap),
+            lua(),
+            EditorView.lineWrapping
+          ]
         }),
         parent: document.getElementById("editor")
       });
@@ -177,7 +186,7 @@
       const container = document.getElementById('scriptItems');
       container.innerHTML = '';
       const scripts = JSON.parse(localStorage.getItem('luaScripts') || '[]');
-      scripts.forEach((script, index) => {
+      scripts.forEach((script) => {
         const div = document.createElement('div');
         div.className = 'script-item';
         div.innerText = script.name;
@@ -206,7 +215,7 @@
     document.getElementById('copyBtn').onclick = () => {
       const text = editor.state.doc.toString();
       navigator.clipboard.writeText(text).then(() => {
-        alert('Copied to clipboard!');
+        alert('Скопировано в буфер обмена!');
       });
     };
 
