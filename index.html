@@ -72,21 +72,14 @@
             border-radius: 8px;
             background-color: #fff9fa;
             position: relative;
-        }
-
-        #editor-background {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            color: rgba(0, 0, 0, 0.2);
-            pointer-events: none;
-            user-select: none;
-            z-index: 0;
+            overflow-y: auto;
         }
 
         #editor-content {
+            min-height: 100%;
             position: relative;
             z-index: 1;
+            white-space: pre;
         }
 
         .line-numbers {
@@ -98,10 +91,12 @@
             font-family: monospace;
             border-right: 1px solid #ffb6c1;
             user-select: none;
+            overflow: hidden;
         }
 
         .editor-wrapper {
             display: flex;
+            height: 500px;
         }
     </style>
 </head>
@@ -110,16 +105,16 @@
         <header>
             <div class="logo">1lua</div>
             <div class="buttons">
-                <button id="downloadBtn">Download Script</button>
+                <button id="downloadBtn">Download</button>
                 <button id="copyBtn">Copy</button>
+                <button id="clearBtn">Clear</button>
             </div>
         </header>
 
         <div class="editor-container">
             <div class="editor-wrapper">
-                <div class="line-numbers" id="lineNumbers">1\n2\n3\n4\n5\n6\n7\n8\n9\n10</div>
+                <div class="line-numbers" id="lineNumbers">1</div>
                 <div id="editor">
-                    <div id="editor-background">print("hello world")</div>
                     <div id="editor-content" contenteditable="true"></div>
                 </div>
             </div>
@@ -132,27 +127,49 @@
         const editorContent = document.getElementById('editor-content');
         const lineNumbers = document.getElementById('lineNumbers');
         
-        editorContent.focus();
-
         function highlight() {
-            editorContent.innerHTML = hljs.highlight(editorContent.innerText, { language: 'lua' }).value;
+            const text = editorContent.innerText;
+            editorContent.innerHTML = hljs.highlight(text, { language: 'lua' }).value;
             updateLineNumbers();
         }
 
         function updateLineNumbers() {
             const lines = editorContent.innerText.split('\n').length;
             let numbers = '';
-            for (let i = 1; i <= Math.max(lines, 10); i++) {
+            for (let i = 1; i <= Math.max(lines, 1); i++) {
                 numbers += i + '\n';
             }
             lineNumbers.innerText = numbers;
         }
 
+        function maintainCursor() {
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                if (!editorContent.contains(range.startContainer)) {
+                    const newRange = document.createRange();
+                    newRange.selectNodeContents(editorContent);
+                    newRange.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                }
+            }
+        }
+
         editorContent.addEventListener('input', () => {
             highlight();
+            maintainCursor();
         });
 
-        highlight();
+        editorContent.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                document.execCommand('insertText', false, '    ');
+            }
+        });
+
+        editorContent.addEventListener('click', maintainCursor);
+        editorContent.addEventListener('blur', maintainCursor);
 
         document.getElementById('downloadBtn').addEventListener('click', () => {
             const text = editorContent.innerText;
@@ -170,33 +187,20 @@
         document.getElementById('copyBtn').addEventListener('click', () => {
             const text = editorContent.innerText;
             navigator.clipboard.writeText(text).then(() => {
-                alert('Script copied to clipboard!');
+                alert('Copied to clipboard!');
             }).catch(err => {
-                console.error('Failed to copy: ', err);
+                console.error('Copy failed:', err);
             });
         });
 
-        editorContent.addEventListener('keydown', function(e) {
-            if (e.key === 'Tab') {
-                e.preventDefault();
-                document.execCommand('insertText', false, '    ');
-            }
-            
-            if (e.key === 'Backspace' && editorContent.innerText === '') {
-                e.preventDefault();
-            }
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            editorContent.innerHTML = '';
+            updateLineNumbers();
+            editorContent.focus();
         });
 
-        editorContent.addEventListener('click', function() {
-            if (editorContent.innerText === '') {
-                const range = document.createRange();
-                const sel = window.getSelection();
-                range.setStart(editorContent, 0);
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
-        });
+        highlight();
+        editorContent.focus();
     </script>
 </body>
 </html>
