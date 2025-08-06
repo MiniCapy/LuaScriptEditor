@@ -13,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/lua/lua.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/closebrackets.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/matchbrackets.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/selection/active-line.js"></script>
 
   <style>
@@ -28,9 +29,9 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      background: #f9b8cc;
+      background: #fdd4df; /* светлая плашка */
       padding: 14px 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
       position: sticky;
       top: 0;
       z-index: 10;
@@ -57,12 +58,12 @@
       font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
     button:hover {
       background-color: #fcb3c5;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
     }
 
     #editor-container {
@@ -75,13 +76,13 @@
     }
 
     .editor-wrapper {
-      background: #ffe4ec;
+      background: #ffeef4; /* насыщенный фон вокруг */
       border-radius: 16px;
       padding: 10px;
       width: 100%;
       max-width: 1000px;
       height: 100%;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
     }
@@ -91,7 +92,7 @@
       font-size: 16px;
       height: 100%;
       border-radius: 10px;
-      background-color: #ffeef4 !important; /* Пастельно-розовый фон редактора */
+      background-color: #ffe4ec !important; /* теперь сам редактор — светлее */
       padding: 10px;
     }
 
@@ -140,8 +141,9 @@ print("Hello, Lua!")
       theme: "material",
       lineNumbers: true,
       styleActiveLine: true,
-      autoCloseBrackets: true, // Автоматическое добавление закрывающихся скобок
-      lineWrapping: true
+      lineWrapping: true,
+      autoCloseBrackets: true,
+      matchBrackets: true // делает скобки интерактивными
     });
 
     function copyCode() {
