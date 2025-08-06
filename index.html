@@ -1,263 +1,120 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>1lua</title>
+  <meta charset="UTF-8">
+  <title>LuaScriptEditor</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/duotone-light.css">
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/lua/lua.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/closebrackets.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/selection/active-line.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #fff0f5;
       margin: 0;
-      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff0f5;
       color: #333;
-    }
-
-    .container {
-      padding: 10px;
     }
 
     header {
       display: flex;
-      flex-wrap: wrap;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 2px solid #ffb6c1;
-      margin-bottom: 10px;
-    }
-
-    .logo-buttons {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      background: #f8c8dc;
+      padding: 10px 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
     .logo {
-      font-size: 24px;
+      font-size: 1.5em;
       font-weight: bold;
-      color: #d85a7f;
-      cursor: pointer;
+      color: #a74f7c;
     }
 
     .buttons {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
+      gap: 10px;
     }
 
     button {
-      background-color: #ffb6c1;
-      color: white;
+      background-color: #ffc1d3;
+      color: #6b2c4d;
       border: none;
-      padding: 6px 12px;
-      border-radius: 5px;
+      border-radius: 8px;
+      padding: 8px 14px;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
-      transition: background-color 0.3s;
+      transition: background 0.3s;
+      font-weight: 600;
     }
 
     button:hover {
-      background-color: #d85a7f;
+      background-color: #f9b5cb;
     }
 
-    .editor-container {
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid #ffb6c1;
-      background: #fff9fa;
-      box-shadow: 0 4px 20px rgba(216, 90, 127, 0.2);
-      height: 70vh;
+    #editor-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      height: calc(100vh - 60px);
+      box-sizing: border-box;
     }
 
-    #editor {
+    .CodeMirror {
       height: 100%;
-    }
-
-    .script-list {
-      position: absolute;
-      top: 60px;
-      left: 10px;
-      background-color: #fff9fa;
-      border: 1px solid #ffb6c1;
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      display: none;
-      max-height: 300px;
-      overflow-y: auto;
-      z-index: 1000;
-    }
-
-    .script-list h4 {
-      margin-top: 0;
-    }
-
-    .script-item {
-      margin: 5px 0;
-      cursor: pointer;
-      padding: 5px;
-      border-radius: 4px;
-      transition: background-color 0.2s;
-    }
-
-    .script-item:hover {
-      background-color: #ffe4ec;
-    }
-
-    .fullscreen {
-      position: fixed !important;
-      top: 0;
-      left: 0;
-      width: 100vw !important;
-      height: 100vh !important;
-      z-index: 999;
-    }
-
-    @media (max-width: 600px) {
-      .logo {
-        font-size: 20px;
-      }
-
-      .buttons {
-        justify-content: center;
-        width: 100%;
-        margin-top: 10px;
-      }
-
-      .editor-container {
-        height: 60vh;
-      }
-
-      button {
-        font-size: 12px;
-        padding: 5px 10px;
-      }
-
-      .script-list {
-        left: 5px;
-        right: 5px;
-      }
+      width: 100%;
+      max-width: 900px;
+      font-size: 16px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="logo-buttons">
-        <div class="logo" id="toggleScriptList">1lua</div>
-      </div>
-      <div class="buttons">
-        <button id="fullscreenBtn">⛶</button>
-        <button id="downloadBtn">Скачать</button>
-        <button id="copyBtn">Копировать</button>
-        <button id="clearBtn">Очистить</button>
-      </div>
-    </header>
 
-    <div class="editor-container" id="editorContainer">
-      <div id="editor"></div>
+  <header>
+    <div class="logo">LuaScriptEditor</div>
+    <div class="buttons">
+      <button onclick="copyCode()">Copy</button>
+      <button onclick="downloadCode()">Download Script</button>
     </div>
+  </header>
 
-    <div class="script-list" id="scriptList">
-      <h4>Сохранённые скрипты</h4>
-      <div id="scriptItems"></div>
-    </div>
+  <div id="editor-container">
+    <textarea id="code">
+// Write your Lua script here
+print("Hello, Lua!")
+    </textarea>
   </div>
 
-  <script type="module">
-    import { EditorView, basicSetup } from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@0.20.0/dist/index.js";
-    import { EditorState } from "https://cdn.jsdelivr.net/npm/@codemirror/state@0.19.1/dist/index.js";
-    import { lua } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-lua@0.19.1/dist/index.js";
-    import { lineNumbers } from "https://cdn.jsdelivr.net/npm/@codemirror/view@0.19.45/dist/index.js";
-    import { oneDark } from "https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@0.19.5/dist/index.js";
+  <script>
+    const editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      mode: "lua",
+      lineNumbers: true,
+      theme: "duotone-light",
+      styleActiveLine: true,
+      autoCloseBrackets: true,
+      lineWrapping: true
+    });
 
-    let editor;
-
-    function createEditor(doc = "-- Пиши здесь свой Lua-код...") {
-      editor = new EditorView({
-        state: EditorState.create({
-          doc,
-          extensions: [basicSetup, lineNumbers(), lua(), oneDark]
-        }),
-        parent: document.getElementById("editor")
-      });
-    }
-
-    function saveToLocalStorage() {
-      const text = editor.state.doc.toString().trim();
-      if (!text) return;
-      const timestamp = new Date().toLocaleString();
-      const name = `Скрипт от ${timestamp}`;
-      const scripts = JSON.parse(localStorage.getItem('luaScripts') || '[]');
-      scripts.unshift({ name, content: text });
-      localStorage.setItem('luaScripts', JSON.stringify(scripts.slice(0, 50)));
-      loadSavedScripts();
-    }
-
-    function loadSavedScripts() {
-      const container = document.getElementById('scriptItems');
-      container.innerHTML = '';
-      const scripts = JSON.parse(localStorage.getItem('luaScripts') || '[]');
-      scripts.forEach((script) => {
-        const div = document.createElement('div');
-        div.className = 'script-item';
-        div.innerText = script.name;
-        div.onclick = () => {
-          editor.dispatch({
-            changes: { from: 0, to: editor.state.doc.length, insert: script.content }
-          });
-        };
-        container.appendChild(div);
-      });
-    }
-
-    document.getElementById('downloadBtn').onclick = () => {
-      const text = editor.state.doc.toString();
-      const blob = new Blob([text], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'script.lua';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    };
-
-    document.getElementById('copyBtn').onclick = () => {
-      const text = editor.state.doc.toString();
+    function copyCode() {
+      const text = editor.getValue();
       navigator.clipboard.writeText(text).then(() => {
-        alert('Скопировано!');
+        alert("Copied to clipboard!");
       });
-    };
+    }
 
-    document.getElementById('clearBtn').onclick = () => {
-      editor.dispatch({
-        changes: { from: 0, to: editor.state.doc.length, insert: '' }
-      });
-      editor.focus();
-    };
-
-    document.getElementById('toggleScriptList').onclick = () => {
-      const list = document.getElementById('scriptList');
-      list.style.display = list.style.display === 'block' ? 'none' : 'block';
-    };
-
-    document.getElementById('fullscreenBtn').onclick = () => {
-      const container = document.getElementById('editorContainer');
-      container.classList.toggle('fullscreen');
-    };
-
-    createEditor();
-    loadSavedScripts();
-    setInterval(saveToLocalStorage, 10000);
+    function downloadCode() {
+      const blob = new Blob([editor.getValue()], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "script.lua";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   </script>
+
 </body>
 </html>
