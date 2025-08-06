@@ -21,47 +21,71 @@
       --button-bg: #f9b8cc;
       --button-hover: #f7a4bf;
       --border-radius: 12px;
+      --gutter-bg: #ffd9e8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: var(--bg-main);
       color: var(--text-color);
-    }
-
-    .header-container {
-      display: flex;
-      justify-content: center;
-      margin: 16px;
+      overflow: hidden;
     }
 
     header {
       display: flex;
-      flex-wrap: nowrap;
-      justify-content: space-between;
+      flex-direction: column;
       align-items: center;
       background: var(--header-bg);
       padding: 14px 20px;
       border-radius: var(--border-radius);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      max-width: 1000px;
+      margin: 16px auto;
+      max-width: 960px;
       width: 100%;
+    }
+
+    .header-top {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    .tab {
+      background: var(--button-bg);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 6px 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--button-hover);
     }
 
     .logo {
       font-size: 1.6em;
-      font-weight: 700;
-      color: var(--text-color);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-weight: bold;
     }
 
     .buttons {
       display: flex;
       gap: 10px;
-      flex-wrap: nowrap;
     }
 
     button {
@@ -72,62 +96,47 @@
       padding: 8px 16px;
       font-weight: 600;
       cursor: pointer;
-      white-space: nowrap;
       transition: all 0.3s ease;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
 
     button:hover {
       background-color: var(--button-hover);
-      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
     }
 
     #editor-container {
+      height: calc(100vh - 200px);
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 15px;
-      height: calc(100vh - 160px);
-      box-sizing: border-box;
+      padding: 0 20px 20px;
     }
 
     .editor-wrapper {
-      background: var(--editor-bg);
+      background: var(--editor-wrapper-bg);
       border-radius: 16px;
-      padding: 10px;
       width: 100%;
-      max-width: 1000px;
+      max-width: 960px;
       height: 100%;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-      display: flex;
-      flex-direction: column;
       overflow: hidden;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
     }
 
     .CodeMirror {
-      flex: 1;
-      font-size: 16px;
       height: 100%;
-      border-radius: 10px;
-      background-color: var(--editor-wrapper-bg) !important;
+      font-size: 16px;
+      background: var(--editor-bg);
       padding: 10px;
-      overflow: auto;
-      scroll-behavior: smooth;
     }
 
     .CodeMirror-gutters {
-      min-width: 40px;
+      background: var(--gutter-bg) !important;
     }
 
     .CodeMirror-scroll {
-      overflow-x: hidden !important;
+      overflow-x: auto !important;
       overflow-y: auto !important;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-    }
-
-    .CodeMirror-scroll::-webkit-scrollbar {
-      display: none;
+      margin-bottom: -30px;
+      padding-bottom: 30px;
     }
 
     @media (max-width: 768px) {
@@ -135,76 +144,91 @@
         flex-wrap: wrap;
         justify-content: center;
       }
-
-      .CodeMirror {
-        font-size: 14px;
-      }
-
-      .logo {
-        text-align: center;
-        width: 100%;
-        margin-bottom: 10px;
-      }
-
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
     }
   </style>
 </head>
 <body>
 
-  <div class="header-container">
-    <header>
+  <header>
+    <div class="header-top">
       <div class="logo">LuaScriptEditor</div>
       <div class="buttons">
         <button onclick="copyCode()">Copy</button>
         <button onclick="downloadCode()">Download</button>
         <button onclick="clearCode()">Clear</button>
+        <button onclick="addTab()">+ Tab</button>
       </div>
-    </header>
-  </div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </header>
 
   <div id="editor-container">
     <div class="editor-wrapper">
-      <textarea id="code">print("Hello, Lua!")</textarea>
+      <textarea id="code">print(\"Hello, Lua!\")</textarea>
     </div>
   </div>
 
   <script>
-    const editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-      mode: "lua",
-      theme: "material",
+    let tabs = []
+    let currentTab = 0
+
+    const editor = CodeMirror.fromTextArea(document.getElementById(\"code\"), {
+      mode: \"lua\",
+      theme: \"material\",
       lineNumbers: true,
       styleActiveLine: true,
       autoCloseBrackets: true,
       matchBrackets: true,
       lineWrapping: false
-    });
+    })
+
+    tabs.push({ name: \"Tab 1\", content: editor.getValue() })
+    renderTabs()
 
     function copyCode() {
-      const text = editor.getValue();
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Copied to clipboard!");
-      });
+      navigator.clipboard.writeText(editor.getValue()).then(() => alert(\"Copied\"))
     }
 
     function downloadCode() {
-      const blob = new Blob([editor.getValue()], { type: "text/plain;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "script.lua";
-      a.click();
-      URL.revokeObjectURL(url);
+      const blob = new Blob([editor.getValue()], { type: \"text/plain;charset=utf-8\" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement(\"a\")
+      a.href = url
+      a.download = \"script.lua\"
+      a.click()
+      URL.revokeObjectURL(url)
     }
 
     function clearCode() {
-      if (confirm("Clear the script?")) {
-        editor.setValue("");
-      }
+      if (confirm(\"Clear the script?\")) editor.setValue(\"\")
+    }
+
+    function renderTabs() {
+      const tabBar = document.getElementById(\"tabs\")
+      tabBar.innerHTML = \"\"
+      tabs.forEach((tab, index) => {
+        const btn = document.createElement(\"button\")
+        btn.className = \"tab\" + (index === currentTab ? \" active\" : \"\")
+        btn.innerText = tab.name
+        btn.onclick = () => switchTab(index)
+        tabBar.appendChild(btn)
+      })
+    }
+
+    function addTab() {
+      const name = prompt(\"New tab name:\", `Tab ${tabs.length + 1}`)
+      if (!name) return
+      tabs.push({ name, content: \"\" })
+      currentTab = tabs.length - 1
+      editor.setValue(\"\"\)
+      renderTabs()
+    }
+
+    function switchTab(index) {
+      tabs[currentTab].content = editor.getValue()
+      currentTab = index
+      editor.setValue(tabs[index].content)
+      renderTabs()
     }
   </script>
 
