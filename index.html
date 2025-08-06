@@ -3,71 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <title>LuaScriptEditor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- CodeMirror CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/duotone-light.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material.css">
+
+  <!-- CodeMirror JS -->
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/lua/lua.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/closebrackets.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/selection/active-line.js"></script>
+
   <style>
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #fff0f5;
+      background: #ffeef4;
       color: #333;
     }
 
     header {
       display: flex;
-      align-items: center;
+      flex-wrap: wrap;
       justify-content: space-between;
-      background: #f8c8dc;
-      padding: 10px 20px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      align-items: center;
+      background: #ffb6c1;
+      padding: 12px 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
     .logo {
       font-size: 1.5em;
       font-weight: bold;
-      color: #a74f7c;
+      color: #7d2942;
     }
 
     .buttons {
       display: flex;
+      flex-wrap: wrap;
       gap: 10px;
+      margin-top: 10px;
     }
 
     button {
       background-color: #ffc1d3;
       color: #6b2c4d;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 8px 14px;
+      font-weight: 600;
       cursor: pointer;
       transition: background 0.3s;
-      font-weight: 600;
     }
 
     button:hover {
-      background-color: #f9b5cb;
+      background-color: #fbaec8;
     }
 
     #editor-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
-      height: calc(100vh - 60px);
+      padding: 15px;
+      height: calc(100vh - 100px);
       box-sizing: border-box;
     }
 
     .CodeMirror {
       height: 100%;
       width: 100%;
-      max-width: 900px;
+      max-width: 1000px;
       font-size: 16px;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .buttons {
+        width: 100%;
+        justify-content: center;
+      }
+
+      #editor-container {
+        padding: 10px;
+      }
+
+      .CodeMirror {
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -77,13 +101,14 @@
     <div class="logo">LuaScriptEditor</div>
     <div class="buttons">
       <button onclick="copyCode()">Copy</button>
-      <button onclick="downloadCode()">Download Script</button>
+      <button onclick="downloadCode()">Download</button>
+      <button onclick="clearCode()">Clear</button>
     </div>
   </header>
 
   <div id="editor-container">
     <textarea id="code">
-// Write your Lua script here
+// Example Lua code
 print("Hello, Lua!")
     </textarea>
   </div>
@@ -91,8 +116,8 @@ print("Hello, Lua!")
   <script>
     const editor = CodeMirror.fromTextArea(document.getElementById("code"), {
       mode: "lua",
+      theme: "material", // яркая подсветка
       lineNumbers: true,
-      theme: "duotone-light",
       styleActiveLine: true,
       autoCloseBrackets: true,
       lineWrapping: true
@@ -113,6 +138,12 @@ print("Hello, Lua!")
       a.download = "script.lua";
       a.click();
       URL.revokeObjectURL(url);
+    }
+
+    function clearCode() {
+      if (confirm("Clear all code?")) {
+        editor.setValue("");
+      }
     }
   </script>
 
