@@ -1,31 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>LuaScriptEditor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
-  <!-- Editor Themes -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/dracula.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/monokai.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/eclipse.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/darcula.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/cobalt.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/base16-dark.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/bespin.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/neat.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/idea.css">
-
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/mode/lua/lua.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/closebrackets.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/edit/matchbrackets.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/selection/active-line.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/hint/show-hint.js"></script>
-
-  <style>
+  <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/addon/selection/active-line.js"></script>  <style>
     :root {
       --bg-main: #fff6fa;
       --header-bg: #ffcede;
@@ -37,6 +20,16 @@
       --border-radius: 12px;
       --gutter-bg: #ffd9e8;
     }
+    .dark {
+      --bg-main: #121212;
+      --header-bg: #1e1e1e;
+      --editor-wrapper-bg: #1e1e1e;
+      --editor-bg: #121212;
+      --text-color: #c0c0c0;
+      --button-bg: #2a2a2a;
+      --button-hover: #333333;
+      --gutter-bg: #2a2a2a;
+    }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
       font-family:'Segoe UI',sans-serif;
@@ -45,7 +38,6 @@
       overflow:hidden;
     }
     header {
-      position:relative;
       background:var(--header-bg);
       padding:14px 20px;
       border-radius:var(--border-radius);
@@ -55,14 +47,8 @@
       align-items:center;
       justify-content:space-between;
     }
-    .logo {
-      font-size:1.6em;
-      font-weight:bold;
-    }
-    .buttons {
-      display:flex;
-      gap:10px;
-    }
+    .logo { font-size:1.6em; font-weight:bold; }
+    .buttons { display:flex; gap:10px; }
     .buttons button {
       background:var(--button-bg);
       color:var(--text-color);
@@ -74,31 +60,13 @@
       transition:background .3s, box-shadow .3s;
       box-shadow:0 1px 3px rgba(0,0,0,0.1);
     }
-    .buttons button:hover {
-      background:var(--button-hover);
-    }
-    #settings {
+    .buttons button:hover { background:var(--button-hover); }
+    #dark-toggle {
       background:transparent;
       border:none;
-      font-size:1.5em;
+      font-size:1.2em;
       cursor:pointer;
-    }
-    #theme-menu {
-      position:absolute;
-      top:50%;
-      right:50px;
-      transform:translateY(-50%);
-      display:none;
-      background:var(--header-bg);
-      border-radius:var(--border-radius);
-      box-shadow:0 4px 8px rgba(0,0,0,0.1);
-      padding:8px;
-    }
-    #theme-select {
-      padding:6px;
-      border-radius:6px;
-      border:none;
-      font-size:1em;
+      color:var(--text-color);
     }
     #tab-bar {
       display:flex;
@@ -120,12 +88,8 @@
       cursor:pointer;
       transition:background .3s;
     }
-    .tab.active {
-      background:var(--button-hover);
-    }
-    .close-tab {
-      cursor:pointer;
-    }
+    .tab.active { background:var(--button-hover); }
+    .close-tab { cursor:pointer; }
     #editor-container {
       height:calc(100vh - 180px);
       display:flex;
@@ -146,33 +110,24 @@
     .CodeMirror {
       height:100%;
       font-size:16px;
-      background:var(--editor-bg);
+      background:var(--editor-bg) !important;
       transition:background .3s;
     }
     .CodeMirror-cursor {
       transition:left .1s ease, top .1s ease;
     }
-    .CodeMirror-gutters {
-      background:var(--gutter-bg)!important;
-    }
-    .CodeMirror-scroll {
-      overflow:auto!important;
-      padding-bottom:30px;
-    }
-    .CodeMirror-code > div:nth-child(odd) {
-      background:var(--editor-bg);
-    }
-    .CodeMirror-code > div:nth-child(even) {
-      background:rgba(255,255,255,0.5);
-    }
-    @media(max-width:768px){
+    .CodeMirror-gutters { background:var(--gutter-bg) !important; }
+    .CodeMirror-scroll { overflow:auto!important; padding-bottom:30px; }
+    .CodeMirror-code > div:nth-child(odd) { background:var(--editor-bg); }
+    .CodeMirror-code > div:nth-child(even) { background:auto; }
+    @media(max-width:768px) {
       .buttons{flex-wrap:wrap;justify-content:center;}
       header{flex-direction:column;align-items:flex-start;gap:10px;}
     }
-  </style>
-</head>
+  </style></head>
 <body>
   <header>
+    <button id="dark-toggle">🌓</button>
     <div class="logo">LuaScriptEditor</div>
     <div class="buttons">
       <button onclick="copyCode()">Copy</button>
@@ -180,43 +135,24 @@
       <button onclick="clearCode()">Clear</button>
       <button onclick="addTab()">+ Tab</button>
     </div>
-    <button id="settings">⋮</button>
-    <div id="theme-menu">
-      <select id="theme-select"></select>
-    </div>
-  </header>
-
-  <div id="tab-bar"></div>
-
-  <div id="editor-container">
+  </header>  <div id="tab-bar"></div>  <div id="editor-container">
     <div class="editor-wrapper">
       <textarea id="code"></textarea>
     </div>
-  </div>
-
-  <script>
-    const themes = [
-      "default","material","monokai","dracula","eclipse","darcula",
-      "cobalt","base16-dark","bespin","neat","idea","yeti","twilight",
-      "neo","midnight"
-    ];
-    const themeSelect = document.getElementById("theme-select");
-    themes.forEach(t => themeSelect.add(new Option(t, t)));
-    themeSelect.onchange = () => editor.setOption("theme", themeSelect.value);
-
-    document.getElementById("settings").onclick = () => {
-      const m = document.getElementById("theme-menu");
-      m.style.display = m.style.display ? "" : "block";
+  </div>  <script>
+    let dark = false;
+    document.getElementById('dark-toggle').onclick = () => {
+      dark = !dark;
+      document.documentElement.classList.toggle('dark', dark);
     };
 
     let tabs = [], currentTab = 0, editor;
-
     function initEditor() {
       editor = CodeMirror.fromTextArea(document.getElementById("code"), {
         mode: "lua",
-        theme: "material",
+        theme: "monokai",
         lineNumbers: true,
-        styleActiveLine: true,
+        styleActiveLine: false,
         autoCloseBrackets: true,
         matchBrackets: true,
         lineWrapping: false
@@ -225,7 +161,6 @@
       editor.setValue(tabs[0].content);
       renderTabs();
     }
-
     function renderTabs() {
       const bar = document.getElementById("tab-bar");
       bar.innerHTML = "";
@@ -234,25 +169,22 @@
         d.className = "tab" + (i === currentTab ? " active" : "");
         d.onclick = () => switchTab(i);
         const n = document.createElement("span"); n.textContent = t.name;
-        const c = document.createElement("span"); c.textContent = "×"; c.className="close-tab";
+        const c = document.createElement("span"); c.textContent = "×"; c.className = "close-tab";
         c.onclick = e => { e.stopPropagation(); closeTab(i); };
         d.append(n, c);
         bar.append(d);
       });
     }
-
     function switchTab(i) {
       tabs[currentTab].content = editor.getValue();
       currentTab = i;
       editor.setValue(tabs[i].content);
       renderTabs();
     }
-
     function addTab() {
       tabs.push({ name: `Tab ${tabs.length+1}`, content: "" });
       switchTab(tabs.length - 1);
     }
-
     function closeTab(i) {
       if (tabs.length === 1) return;
       tabs.splice(i, 1);
@@ -260,22 +192,13 @@
       editor.setValue(tabs[currentTab].content);
       renderTabs();
     }
-
-    function copyCode() {
-      navigator.clipboard.writeText(editor.getValue()).then(()=>alert("Copied"));
-    }
-
+    function copyCode() { navigator.clipboard.writeText(editor.getValue()).then(() => alert("Copied")); }
     function downloadCode() {
-      const b = new Blob([editor.getValue()], {type:"text/plain;charset=utf-8"}),
-            u = URL.createObjectURL(b), a = document.createElement("a");
+      const b = new Blob([editor.getValue()], { type: "text/plain;charset=utf-8" });
+      const u = URL.createObjectURL(b), a = document.createElement("a");
       a.href = u; a.download = "script.lua"; a.click(); URL.revokeObjectURL(u);
     }
-
-    function clearCode() {
-      if (confirm("Clear the script?")) editor.setValue("");
-    }
-
+    function clearCode() { if (confirm("Clear the script?")) editor.setValue(""); }
     window.onload = initEditor;
-  </script>
-</body>
+  </script></body>
 </html>
