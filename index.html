@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>LuaScriptEditor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
+
   <!-- CodeMirror CSS -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material.css">
@@ -19,7 +19,7 @@
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: #ffeef4;
+      background: #fff0f5;
       color: #333;
     }
 
@@ -28,69 +28,87 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      background: #ffb6c1;
-      padding: 12px 20px;
+      background: #f9b8cc;
+      padding: 14px 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .logo {
-      font-size: 1.5em;
-      font-weight: bold;
-      color: #7d2942;
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #6b1c3a;
     }
 
     .buttons {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
-      margin-top: 10px;
+      flex-wrap: wrap;
     }
 
     button {
-      background-color: #ffc1d3;
-      color: #6b2c4d;
+      background-color: #ffd6e0;
+      color: #6b1c3a;
       border: none;
-      border-radius: 10px;
-      padding: 8px 14px;
+      border-radius: 12px;
+      padding: 8px 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
     button:hover {
-      background-color: #fbaec8;
+      background-color: #fcb3c5;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
     }
 
     #editor-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 15px;
-      height: calc(100vh - 100px);
+      padding: 25px 15px;
+      height: calc(100vh - 90px);
       box-sizing: border-box;
     }
 
-    .CodeMirror {
-      height: 100%;
+    .editor-wrapper {
+      background: #ffe4ec;
+      border-radius: 16px;
+      padding: 10px;
       width: 100%;
       max-width: 1000px;
+      height: 100%;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .CodeMirror {
+      flex: 1;
       font-size: 16px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      height: 100%;
+      border-radius: 10px;
+      background: transparent;
     }
 
     @media (max-width: 768px) {
       .buttons {
-        width: 100%;
         justify-content: center;
-      }
-
-      #editor-container {
-        padding: 10px;
+        width: 100%;
+        margin-top: 10px;
       }
 
       .CodeMirror {
         font-size: 14px;
+      }
+
+      .logo {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 5px;
       }
     }
   </style>
@@ -107,16 +125,18 @@
   </header>
 
   <div id="editor-container">
-    <textarea id="code">
-// Example Lua code
+    <div class="editor-wrapper">
+      <textarea id="code">
+// Example Lua script
 print("Hello, Lua!")
-    </textarea>
+      </textarea>
+    </div>
   </div>
 
   <script>
     const editor = CodeMirror.fromTextArea(document.getElementById("code"), {
       mode: "lua",
-      theme: "material", // яркая подсветка
+      theme: "material",
       lineNumbers: true,
       styleActiveLine: true,
       autoCloseBrackets: true,
@@ -141,7 +161,7 @@ print("Hello, Lua!")
     }
 
     function clearCode() {
-      if (confirm("Clear all code?")) {
+      if (confirm("Clear the script?")) {
         editor.setValue("");
       }
     }
