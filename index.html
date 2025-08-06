@@ -1,8 +1,7 @@
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>LuaScriptEditor</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuaScriptEditor</n><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material.css">
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
@@ -45,6 +44,7 @@
       background:var(--button-bg); padding:6px 10px; border-radius:var(--border-radius);
       font-weight:bold; display:flex; align-items:center; gap:6px;
       box-shadow:0 1px 3px rgba(0,0,0,0.1);
+      cursor:pointer;
     }
     .tab.active { background:var(--button-hover); }
     .close-tab { cursor:pointer; }
@@ -55,7 +55,7 @@
     .editor-wrapper {
       background:var(--editor-wrapper-bg); border-radius:16px;
       width:100%; max-width:960px; height:100%; overflow:hidden;
-      box-shadow:0 10px 20px rgba(0,0,0,0.05); border:1px solid var(--button-bg);
+      box-shadow:0 10px 20px rgba(0,0,0,0.05);
     }
     .CodeMirror {
       height:100%; font-size:16px; background:var(--editor-bg);
@@ -88,36 +88,55 @@
     </div>
   </div>
   <script>
-    let tabs=[]; let currentTab=0; let editor;
+    let tabs=[], currentTab=0, editor;
     function initEditor(){
       editor=CodeMirror.fromTextArea(document.getElementById("code"),{
         mode:"lua", theme:"material", lineNumbers:true,
         styleActiveLine:true, autoCloseBrackets:true,
         matchBrackets:true, lineWrapping:false
       });
-      tabs.push({name:"Tab 1",content:"print(\"Hello, Lua!\")"});
-      editor.setValue(tabs[0].content); renderTabs();
+      tabs=[{name:"Tab 1",content:editor.getValue()}];
+      editor.setValue(tabs[0].content);
+      renderTabs();
     }
     function renderTabs(){
       const bar=document.getElementById("tab-bar"); bar.innerHTML="";
-      tabs.forEach((t,i)=>{const d=document.createElement("div");
+      tabs.forEach((t,i)=>{
+        const d=document.createElement("div");
         d.className="tab"+(i===currentTab?" active":"");
-        d.innerHTML=`${t.name} <span class='close-tab' onclick='closeTab(${i})'>×</span>`;
-        d.onclick=()=>switchTab(i); bar.appendChild(d);
+        d.onclick=()=>switchTab(i);
+        const spanName=document.createElement("span"); spanName.textContent=t.name;
+        const spanClose=document.createElement("span"); spanClose.textContent="×";
+        spanClose.className="close-tab";
+        spanClose.onclick=(e)=>{e.stopPropagation(); closeTab(i);};
+        d.appendChild(spanName); d.appendChild(spanClose);
+        bar.appendChild(d);
       });
     }
-    function switchTab(i){tabs[currentTab].content=editor.getValue(); currentTab=i;
-      editor.setValue(tabs[i].content); renderTabs();}
-    function addTab(){tabs.push({name:`Tab ${tabs.length+1}`,content:""});
-      switchTab(tabs.length-1);}    
-    function closeTab(i){if(tabs.length===1)return; tabs.splice(i,1);
-      if(currentTab>=i)currentTab=Math.max(0,currentTab-1);
-      editor.setValue(tabs[currentTab].content); renderTabs();}
+    function switchTab(i){
+      tabs[currentTab].content=editor.getValue();
+      currentTab=i;
+      editor.setValue(tabs[i].content);
+      renderTabs();
+    }
+    function addTab(){
+      tabs.push({name:`Tab ${tabs.length+1}`,content:""});
+      switchTab(tabs.length-1);
+    }
+    function closeTab(i){
+      if(tabs.length===1) return;
+      tabs.splice(i,1);
+      if(currentTab>=i) currentTab=Math.max(0,currentTab-1);
+      editor.setValue(tabs[currentTab].content);
+      renderTabs();
+    }
     function copyCode(){navigator.clipboard.writeText(editor.getValue()).then(()=>alert("Copied"));}
-    function downloadCode(){const b=new Blob([editor.getValue()],{type:"text/plain;charset=utf-8"});
-      const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download="script.lua";
-      a.click();URL.revokeObjectURL(u);} 
-    function clearCode(){if(confirm("Clear the script?"))editor.setValue("");}
+    function downloadCode(){
+      const b=new Blob([editor.getValue()],{type:"text/plain;charset=utf-8"});
+      const u=URL.createObjectURL(b),a=document.createElement("a");
+      a.href=u; a.download="script.lua"; a.click(); URL.revokeObjectURL(u);
+    }
+    function clearCode(){if(confirm("Clear the script?")) editor.setValue("");}
     window.onload=initEditor;
   </script>
 </body>
