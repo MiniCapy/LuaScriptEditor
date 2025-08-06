@@ -115,6 +115,7 @@
       border-radius: 10px;
       background-color: var(--editor-bg) !important;
       padding: 10px;
+      overflow: auto;
     }
 
     @media (max-width: 768px) {
@@ -169,9 +170,9 @@ print("Hello, Lua!")
       theme: "material",
       lineNumbers: true,
       styleActiveLine: true,
-      lineWrapping: true,
       autoCloseBrackets: true,
-      matchBrackets: true
+      matchBrackets: true,
+      lineWrapping: false // отключён перенос строк
     });
 
     function copyCode() {
