@@ -1,7 +1,8 @@
 <!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>LuaScriptEditor</n><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LuaScriptEditor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/theme/material.css">
   <script src="https://cdn.jsdelivr.net/npm/codemirror@5.65.16/lib/codemirror.js"></script>
@@ -15,7 +16,6 @@
       --header-bg: #ffcede;
       --editor-wrapper-bg: #ffd9e8;
       --editor-bg: #ffeef4;
-      --stripe-bg: #fff1f8;
       --text-color: #5b1f36;
       --button-bg: #f9b8cc;
       --button-hover: #f7a4bf;
@@ -27,28 +27,30 @@
     header {
       background:var(--header-bg); padding:14px 20px; border-radius:var(--border-radius);
       margin:16px auto 10px; max-width:960px; width:100%;
+      display:flex; justify-content:space-between; align-items:center;
     }
-    .logo { font-size:1.6em; font-weight:bold; margin-bottom:10px; }
-    .buttons { display:flex; gap:10px; flex-wrap:wrap; }
-    button {
+    .logo { font-size:1.6em; font-weight:bold; }
+    .buttons { display:flex; gap:10px; }
+    .buttons button {
       background-color:var(--button-bg); color:var(--text-color); border:none;
       border-radius:var(--border-radius); padding:8px 16px; font-weight:600;
       cursor:pointer; transition:background 0.3s ease; box-shadow:0 1px 3px rgba(0,0,0,0.1);
     }
-    button:hover { background-color:var(--button-hover); }
+    .buttons button:hover { background-color:var(--button-hover); }
     #tab-bar {
-      display:flex; justify-content:flex-start; flex-wrap:wrap; gap:6px;
-      padding:8px 20px; max-width:960px; margin:0 auto 10px;
+      display:flex; gap:6px; padding:8px 20px; max-width:960px; margin:0 auto 10px;
+      flex-wrap:wrap;
     }
     .tab {
       background:var(--button-bg); padding:6px 10px; border-radius:var(--border-radius);
       font-weight:bold; display:flex; align-items:center; gap:6px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.1);
     }
     .tab.active { background:var(--button-hover); }
-    .close-tab { font-weight:bold; cursor:pointer; }
+    .close-tab { cursor:pointer; }
     #editor-container {
-      height:calc(100vh - 180px); display:flex; justify-content:center;
-      align-items:center; padding:0 20px 20px;
+      height:calc(100vh - 180px); display:flex;
+      justify-content:center; align-items:center; padding:0 20px 20px;
     }
     .editor-wrapper {
       background:var(--editor-wrapper-bg); border-radius:16px;
@@ -63,11 +65,9 @@
       overflow-x:auto !important; overflow-y:auto !important;
       margin-bottom:-30px; padding-bottom:30px;
     }
-    /* GitHub-like stripe lines */
-    .CodeMirror-code > div:nth-child(odd) { background: var(--editor-bg); }
-    .CodeMirror-code > div:nth-child(even) { background: var(--stripe-bg); }
     @media(max-width:768px) {
-      .buttons { justify-content:center; }
+      .buttons { flex-wrap:wrap; justify-content:center; }
+      header { flex-direction:column; align-items:flex-start; gap:10px; }
     }
   </style>
 </head>
@@ -91,8 +91,9 @@
     let tabs=[]; let currentTab=0; let editor;
     function initEditor(){
       editor=CodeMirror.fromTextArea(document.getElementById("code"),{
-        mode:"lua",theme:"material",lineNumbers:true,styleActiveLine:true,
-        autoCloseBrackets:true,matchBrackets:true,lineWrapping:false
+        mode:"lua", theme:"material", lineNumbers:true,
+        styleActiveLine:true, autoCloseBrackets:true,
+        matchBrackets:true, lineWrapping:false
       });
       tabs.push({name:"Tab 1",content:"print(\"Hello, Lua!\")"});
       editor.setValue(tabs[0].content); renderTabs();
@@ -105,8 +106,8 @@
         d.onclick=()=>switchTab(i); bar.appendChild(d);
       });
     }
-    function switchTab(i){tabs[currentTab].content=editor.getValue();
-      currentTab=i; editor.setValue(tabs[i].content); renderTabs();}
+    function switchTab(i){tabs[currentTab].content=editor.getValue(); currentTab=i;
+      editor.setValue(tabs[i].content); renderTabs();}
     function addTab(){tabs.push({name:`Tab ${tabs.length+1}`,content:""});
       switchTab(tabs.length-1);}    
     function closeTab(i){if(tabs.length===1)return; tabs.splice(i,1);
