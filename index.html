@@ -140,13 +140,11 @@
   </div>
 
   <script type="module">
-    import {EditorView, keymap, highlightSpecialChars, drawSelection, highlightActiveLine} from "https://esm.sh/@codemirror/view";
-    import {EditorState} from "https://esm.sh/@codemirror/state";
-    import {defaultHighlightStyle} from "https://esm.sh/@codemirror/highlight";
-    import {lineNumbers} from "https://esm.sh/@codemirror/gutter";
-    import {history, historyKeymap} from "https://esm.sh/@codemirror/commands";
-    import {indentOnInput} from "https://esm.sh/@codemirror/language";
-    import {lua} from "https://esm.sh/@codemirror/lang-lua";
+    import { EditorView, basicSetup } from "https://cdn.jsdelivr.net/npm/@codemirror/basic-setup@0.20.0/dist/index.js";
+    import { EditorState } from "https://cdn.jsdelivr.net/npm/@codemirror/state@0.19.1/dist/index.js";
+    import { lua } from "https://cdn.jsdelivr.net/npm/@codemirror/lang-lua@0.19.1/dist/index.js";
+    import { lineNumbers } from "https://cdn.jsdelivr.net/npm/@codemirror/view@0.19.45/dist/index.js";
+    import { oneDark } from "https://cdn.jsdelivr.net/npm/@codemirror/theme-one-dark@0.19.5/dist/index.js";
 
     let editor;
 
@@ -155,16 +153,10 @@
         state: EditorState.create({
           doc,
           extensions: [
+            basicSetup,
             lineNumbers(),
-            highlightSpecialChars(),
-            history(),
-            drawSelection(),
-            indentOnInput(),
-            highlightActiveLine(),
-            defaultHighlightStyle.fallback,
-            keymap.of(historyKeymap),
             lua(),
-            EditorView.lineWrapping
+            oneDark
           ]
         }),
         parent: document.getElementById("editor")
@@ -215,7 +207,7 @@
     document.getElementById('copyBtn').onclick = () => {
       const text = editor.state.doc.toString();
       navigator.clipboard.writeText(text).then(() => {
-        alert('Скопировано в буфер обмена!');
+        alert('Скопировано в буфер!');
       });
     };
 
