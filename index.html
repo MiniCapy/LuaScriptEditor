@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lua Editor</title>
+  <title>1lua</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #fff0f5;
@@ -14,28 +18,27 @@
     }
 
     .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
+      padding: 10px;
     }
 
     header {
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      padding: 15px 0;
+      padding: 10px 0;
       border-bottom: 2px solid #ffb6c1;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .logo-buttons {
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 10px;
     }
 
     .logo {
-      font-size: 28px;
+      font-size: 24px;
       font-weight: bold;
       color: #d85a7f;
       cursor: pointer;
@@ -43,17 +46,20 @@
 
     .buttons {
       display: flex;
-      gap: 10px;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
     button {
       background-color: #ffb6c1;
       color: white;
       border: none;
-      padding: 8px 15px;
+      padding: 6px 12px;
       border-radius: 5px;
       cursor: pointer;
       font-weight: bold;
+      font-size: 14px;
       transition: background-color 0.3s;
     }
 
@@ -67,7 +73,7 @@
       border: 1px solid #ffb6c1;
       background: #fff9fa;
       box-shadow: 0 4px 20px rgba(216, 90, 127, 0.2);
-      height: 500px;
+      height: 70vh;
     }
 
     #editor {
@@ -76,8 +82,8 @@
 
     .script-list {
       position: absolute;
-      top: 65px;
-      left: 20px;
+      top: 60px;
+      left: 10px;
       background-color: #fff9fa;
       border: 1px solid #ffb6c1;
       border-radius: 8px;
@@ -113,19 +119,45 @@
       height: 100vh !important;
       z-index: 999;
     }
+
+    @media (max-width: 600px) {
+      .logo {
+        font-size: 20px;
+      }
+
+      .buttons {
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+      }
+
+      .editor-container {
+        height: 60vh;
+      }
+
+      button {
+        font-size: 12px;
+        padding: 5px 10px;
+      }
+
+      .script-list {
+        left: 5px;
+        right: 5px;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div class="logo-buttons">
-        <div class="logo" id="toggleScriptList">Скрипты</div>
+        <div class="logo" id="toggleScriptList">1lua</div>
       </div>
       <div class="buttons">
         <button id="fullscreenBtn">⛶</button>
-        <button id="downloadBtn">Download</button>
-        <button id="copyBtn">Copy</button>
-        <button id="clearBtn">Clear</button>
+        <button id="downloadBtn">Скачать</button>
+        <button id="copyBtn">Копировать</button>
+        <button id="clearBtn">Очистить</button>
       </div>
     </header>
 
@@ -152,12 +184,7 @@
       editor = new EditorView({
         state: EditorState.create({
           doc,
-          extensions: [
-            basicSetup,
-            lineNumbers(),
-            lua(),
-            oneDark
-          ]
+          extensions: [basicSetup, lineNumbers(), lua(), oneDark]
         }),
         parent: document.getElementById("editor")
       });
@@ -165,7 +192,7 @@
 
     function saveToLocalStorage() {
       const text = editor.state.doc.toString().trim();
-      if (text.length === 0) return;
+      if (!text) return;
       const timestamp = new Date().toLocaleString();
       const name = `Скрипт от ${timestamp}`;
       const scripts = JSON.parse(localStorage.getItem('luaScripts') || '[]');
@@ -207,7 +234,7 @@
     document.getElementById('copyBtn').onclick = () => {
       const text = editor.state.doc.toString();
       navigator.clipboard.writeText(text).then(() => {
-        alert('Скопировано в буфер!');
+        alert('Скопировано!');
       });
     };
 
