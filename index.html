@@ -35,9 +35,6 @@ body {
 }
 
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   background: var(--header-bg);
   padding: 14px 20px;
   border-radius: var(--border-radius);
@@ -49,11 +46,13 @@ header {
 .logo {
   font-size: 1.6em;
   font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .buttons {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 button {
