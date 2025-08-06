@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>LuaScriptEditor</title>
@@ -22,215 +21,205 @@
       --button-hover: #f7a4bf;
       --border-radius: 12px;
       --gutter-bg: #ffd9e8;
-    }
+    }* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--bg-main);
+  color: var(--text-color);
+  overflow: hidden;
+}
 
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg-main);
-      color: var(--text-color);
-      overflow: hidden;
-    }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--header-bg);
+  padding: 14px 20px;
+  border-radius: var(--border-radius);
+  margin: 16px auto 10px;
+  max-width: 960px;
+  width: 100%;
+}
 
-    header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: var(--header-bg);
-      padding: 14px 20px;
-      border-radius: var(--border-radius);
-      margin: 16px auto;
-      max-width: 960px;
-      width: 100%;
-    }
+.logo {
+  font-size: 1.6em;
+  font-weight: bold;
+}
 
-    .header-top {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
+.buttons {
+  display: flex;
+  gap: 10px;
+}
 
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-top: 10px;
-      flex-wrap: wrap;
-      width: 100%;
-    }
+button {
+  background-color: var(--button-bg);
+  color: var(--text-color);
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
-    .tab {
-      background: var(--button-bg);
-      border: none;
-      border-radius: var(--border-radius);
-      padding: 6px 12px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+button:hover {
+  background-color: var(--button-hover);
+}
 
-    .tab.active {
-      background: var(--button-hover);
-    }
+#tab-bar {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 20px;
+  max-width: 960px;
+  margin: 0 auto 10px;
+}
 
-    .logo {
-      font-size: 1.6em;
-      font-weight: bold;
-    }
+.tab {
+  background: var(--button-bg);
+  padding: 6px 10px;
+  border-radius: var(--border-radius);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-    .buttons {
-      display: flex;
-      gap: 10px;
-    }
+.tab.active {
+  background: var(--button-hover);
+}
 
-    button {
-      background-color: var(--button-bg);
-      color: var(--text-color);
-      border: none;
-      border-radius: var(--border-radius);
-      padding: 8px 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
+.close-tab {
+  font-weight: bold;
+  cursor: pointer;
+}
 
-    button:hover {
-      background-color: var(--button-hover);
-    }
+#editor-container {
+  height: calc(100vh - 180px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 20px 20px;
+}
 
-    #editor-container {
-      height: calc(100vh - 200px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0 20px 20px;
-    }
+.editor-wrapper {
+  background: var(--editor-wrapper-bg);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 960px;
+  height: 100%;
+  overflow: hidden;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
 
-    .editor-wrapper {
-      background: var(--editor-wrapper-bg);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 960px;
-      height: 100%;
-      overflow: hidden;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    }
+.CodeMirror {
+  height: 100%;
+  font-size: 16px;
+  background: var(--editor-bg);
+}
 
-    .CodeMirror {
-      height: 100%;
-      font-size: 16px;
-      background: var(--editor-bg);
-      padding: 10px;
-    }
+.CodeMirror-gutters {
+  background: var(--gutter-bg) !important;
+}
 
-    .CodeMirror-gutters {
-      background: var(--gutter-bg) !important;
-    }
+.CodeMirror-scroll {
+  overflow-x: auto !important;
+  overflow-y: auto !important;
+  margin-bottom: -30px;
+  padding-bottom: 30px;
+}
 
-    .CodeMirror-scroll {
-      overflow-x: auto !important;
-      overflow-y: auto !important;
-      margin-bottom: -30px;
-      padding-bottom: 30px;
-    }
-
-    @media (max-width: 768px) {
-      .buttons {
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-    }
   </style>
 </head>
 <body>
-
   <header>
-    <div class="header-top">
-      <div class="logo">LuaScriptEditor</div>
-      <div class="buttons">
-        <button onclick="copyCode()">Copy</button>
-        <button onclick="downloadCode()">Download</button>
-        <button onclick="clearCode()">Clear</button>
-        <button onclick="addTab()">+ Tab</button>
-      </div>
+    <div class="logo">LuaScriptEditor</div>
+    <div class="buttons">
+      <button onclick="copyCode()">Copy</button>
+      <button onclick="downloadCode()">Download</button>
+      <button onclick="clearCode()">Clear</button>
+      <button onclick="addTab()">+ Tab</button>
     </div>
-    <div class="tabs" id="tabs"></div>
-  </header>
-
-  <div id="editor-container">
+  </header>  <div id="tab-bar"></div>  <div id="editor-container">
     <div class="editor-wrapper">
-      <textarea id="code">print(\"Hello, Lua!\")</textarea>
+      <textarea id="code"></textarea>
     </div>
-  </div>
-
-  <script>
+  </div>  <script>
     let tabs = []
     let currentTab = 0
+    let editor
 
-    const editor = CodeMirror.fromTextArea(document.getElementById(\"code\"), {
-      mode: \"lua\",
-      theme: \"material\",
-      lineNumbers: true,
-      styleActiveLine: true,
-      autoCloseBrackets: true,
-      matchBrackets: true,
-      lineWrapping: false
-    })
-
-    tabs.push({ name: \"Tab 1\", content: editor.getValue() })
-    renderTabs()
-
-    function copyCode() {
-      navigator.clipboard.writeText(editor.getValue()).then(() => alert(\"Copied\"))
-    }
-
-    function downloadCode() {
-      const blob = new Blob([editor.getValue()], { type: \"text/plain;charset=utf-8\" })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement(\"a\")
-      a.href = url
-      a.download = \"script.lua\"
-      a.click()
-      URL.revokeObjectURL(url)
-    }
-
-    function clearCode() {
-      if (confirm(\"Clear the script?\")) editor.setValue(\"\")
+    function initEditor() {
+      editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        mode: "lua",
+        theme: "material",
+        lineNumbers: true,
+        styleActiveLine: true,
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        lineWrapping: false
+      });
+      tabs.push({ name: "Tab 1", content: "print(\"Hello, Lua!\")" })
+      editor.setValue(tabs[0].content)
+      renderTabs()
     }
 
     function renderTabs() {
-      const tabBar = document.getElementById(\"tabs\")
-      tabBar.innerHTML = \"\"
-      tabs.forEach((tab, index) => {
-        const btn = document.createElement(\"button\")
-        btn.className = \"tab\" + (index === currentTab ? \" active\" : \"\")
-        btn.innerText = tab.name
-        btn.onclick = () => switchTab(index)
-        tabBar.appendChild(btn)
+      const tabBar = document.getElementById("tab-bar")
+      tabBar.innerHTML = ""
+      tabs.forEach((tab, i) => {
+        const tabElement = document.createElement("div")
+        tabElement.className = "tab" + (i === currentTab ? " active" : "")
+        tabElement.innerHTML = `${tab.name} <span class="close-tab" onclick="closeTab(${i})">×</span>`
+        tabElement.onclick = () => switchTab(i)
+        tabBar.appendChild(tabElement)
       })
-    }
-
-    function addTab() {
-      const name = prompt(\"New tab name:\", `Tab ${tabs.length + 1}`)
-      if (!name) return
-      tabs.push({ name, content: \"\" })
-      currentTab = tabs.length - 1
-      editor.setValue(\"\"\)
-      renderTabs()
     }
 
     function switchTab(index) {
       tabs[currentTab].content = editor.getValue()
       currentTab = index
-      editor.setValue(tabs[index].content)
+      editor.setValue(tabs[currentTab].content)
       renderTabs()
     }
-  </script>
 
-</body>
+    function addTab() {
+      tabs.push({ name: `Tab ${tabs.length + 1}`, content: "" })
+      switchTab(tabs.length - 1)
+    }
+
+    function closeTab(index) {
+      if (tabs.length === 1) return
+      tabs.splice(index, 1)
+      if (currentTab >= index) currentTab = Math.max(0, currentTab - 1)
+      editor.setValue(tabs[currentTab].content)
+      renderTabs()
+    }
+
+    function copyCode() {
+      navigator.clipboard.writeText(editor.getValue()).then(() => alert("Copied"))
+    }
+
+    function downloadCode() {
+      const blob = new Blob([editor.getValue()], { type: "text/plain;charset=utf-8" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = "script.lua"
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+
+    function clearCode() {
+      if (confirm("Clear the script?")) editor.setValue("")
+    }
+
+    window.onload = initEditor
+  </script></body>
 </html>
