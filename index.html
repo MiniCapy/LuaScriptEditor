@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LuaScriptEditor</title>
+    <title>1lua</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-light.min.css">
     <style>
         body {
@@ -58,7 +58,7 @@
         .editor-container {
             background-color: white;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(216, 90, 127, 0.1);
+            box-shadow: 0 4px 20px rgba(216, 90, 127, 0.2);
             overflow: hidden;
         }
 
@@ -71,6 +71,22 @@
             border: 1px solid #ffb6c1;
             border-radius: 8px;
             background-color: #fff9fa;
+            position: relative;
+        }
+
+        #editor-background {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: rgba(0, 0, 0, 0.2);
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+        }
+
+        #editor-content {
+            position: relative;
+            z-index: 1;
         }
 
         .line-numbers {
@@ -87,20 +103,12 @@
         .editor-wrapper {
             display: flex;
         }
-
-        footer {
-            text-align: center;
-            margin-top: 20px;
-            padding: 15px 0;
-            color: #d85a7f;
-            font-size: 14px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="logo">LuaScriptEditor</div>
+            <div class="logo">1lua</div>
             <div class="buttons">
                 <button id="downloadBtn">Download Script</button>
                 <button id="copyBtn">Copy</button>
@@ -110,61 +118,44 @@
         <div class="editor-container">
             <div class="editor-wrapper">
                 <div class="line-numbers" id="lineNumbers">1\n2\n3\n4\n5\n6\n7\n8\n9\n10</div>
-                <pre id="editor" contenteditable="true">-- Write your Lua script here
-function greet(name)
-    print("Hello, " .. name .. "!")
-end
-
--- Example table
-local colors = {
-    red = "#FF0000",
-    green = "#00FF00",
-    blue = "#0000FF"
-}
-
--- Call the function
-greet("Lua Programmer")</pre>
+                <div id="editor">
+                    <div id="editor-background">print("hello world")</div>
+                    <div id="editor-content" contenteditable="true"></div>
+                </div>
             </div>
         </div>
-
-        <footer>
-            LuaScriptEditor &copy; 2023 | Simple and elegant Lua code editor
-        </footer>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/languages/lua.min.js"></script>
     <script>
-        // Syntax highlighting
-        const editor = document.getElementById('editor');
+        const editorContent = document.getElementById('editor-content');
         const lineNumbers = document.getElementById('lineNumbers');
         
+        editorContent.focus();
+
         function highlight() {
-            editor.innerHTML = hljs.highlight(editor.innerText, { language: 'lua' }).value;
+            editorContent.innerHTML = hljs.highlight(editorContent.innerText, { language: 'lua' }).value;
             updateLineNumbers();
         }
 
-        // Line numbers
         function updateLineNumbers() {
-            const lines = editor.innerText.split('\n').length;
+            const lines = editorContent.innerText.split('\n').length;
             let numbers = '';
-            for (let i = 1; i <= lines; i++) {
+            for (let i = 1; i <= Math.max(lines, 10); i++) {
                 numbers += i + '\n';
             }
             lineNumbers.innerText = numbers;
         }
 
-        // Auto line numbers and highlighting
-        editor.addEventListener('input', () => {
+        editorContent.addEventListener('input', () => {
             highlight();
         });
 
-        // Initial highlight
         highlight();
 
-        // Download button
         document.getElementById('downloadBtn').addEventListener('click', () => {
-            const text = editor.innerText;
+            const text = editorContent.innerText;
             const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -176,9 +167,8 @@ greet("Lua Programmer")</pre>
             URL.revokeObjectURL(url);
         });
 
-        // Copy button
         document.getElementById('copyBtn').addEventListener('click', () => {
-            const text = editor.innerText;
+            const text = editorContent.innerText;
             navigator.clipboard.writeText(text).then(() => {
                 alert('Script copied to clipboard!');
             }).catch(err => {
@@ -186,11 +176,25 @@ greet("Lua Programmer")</pre>
             });
         });
 
-        // Preserve tabs
-        editor.addEventListener('keydown', function(e) {
+        editorContent.addEventListener('keydown', function(e) {
             if (e.key === 'Tab') {
                 e.preventDefault();
                 document.execCommand('insertText', false, '    ');
+            }
+            
+            if (e.key === 'Backspace' && editorContent.innerText === '') {
+                e.preventDefault();
+            }
+        });
+
+        editorContent.addEventListener('click', function() {
+            if (editorContent.innerText === '') {
+                const range = document.createRange();
+                const sel = window.getSelection();
+                range.setStart(editorContent, 0);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
             }
         });
     </script>
